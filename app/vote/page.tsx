@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 type Player = {
@@ -9,7 +9,7 @@ type Player = {
   last_name: string
 }
 
-export default function VotePage() {
+function VoteContent() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
@@ -250,5 +250,20 @@ export default function VotePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VotePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Lastar...</p>
+        </div>
+      </div>
+    }>
+      <VoteContent />
+    </Suspense>
   )
 }
