@@ -35,16 +35,12 @@ export async function GET(request: NextRequest) {
     }, { status: 404 })
   }
 
-  // Sjekk om spelaren allereie har svart
+  // Sjekk om spelaren allereie har svart (for å vise tidlegare val)
   const { data: existingResponse } = await supabase
     .from('responses')
     .select('*')
     .eq('player_id', player.id)
     .single()
-
-  if (existingResponse) {
-    return NextResponse.json({ error: 'Du har allereie svart' }, { status: 409 })
-  }
 
   // Hent alle andre spelare (utanom seg sjølv)
   const { data: allPlayers, error: playersError } = await supabase
@@ -64,5 +60,11 @@ export async function GET(request: NextRequest) {
       last_name: player.last_name,
     },
     availablePlayers: allPlayers,
+    existingResponse: existingResponse ? {
+      choice_1: existingResponse.choice_1,
+      choice_2: existingResponse.choice_2,
+      choice_3: existingResponse.choice_3,
+      no_preference: existingResponse.no_preference,
+    } : null,
   })
 }

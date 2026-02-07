@@ -21,6 +21,7 @@ function VoteContent() {
   const [noPreference, setNoPreference] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     if (!token) {
@@ -45,6 +46,22 @@ function VoteContent() {
 
       setCurrentPlayer(data.player)
       setAvailablePlayers(data.availablePlayers)
+      
+      // Viss spelaren har svart tidlegare, fyll inn vala
+      if (data.existingResponse) {
+        setIsEditing(true)
+        setNoPreference(data.existingResponse.no_preference)
+        
+        if (!data.existingResponse.no_preference) {
+          const choices = [
+            data.existingResponse.choice_1,
+            data.existingResponse.choice_2,
+            data.existingResponse.choice_3,
+          ].filter(Boolean)
+          setSelectedPlayers(choices)
+        }
+      }
+      
       setLoading(false)
     } catch (err) {
       setError('Kunne ikkje laste data')
@@ -145,7 +162,18 @@ function VoteContent() {
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Takk!</h2>
-          <p className="text-gray-600">Svaret ditt er registrert.</p>
+          <p className="text-gray-600 mb-4">
+            {isEditing ? 'Valet ditt er oppdatert.' : 'Svaret ditt er registrert.'}
+          </p>
+          <button
+            onClick={() => {
+              setSubmitted(false)
+              fetchPlayerData()
+            }}
+            className="text-blue-600 hover:text-blue-700 text-sm"
+          >
+            Endre svaret mitt
+          </button>
         </div>
       </div>
     )
@@ -165,8 +193,15 @@ function VoteContent() {
             Hei {currentPlayer?.first_name}! ⚽
           </h1>
           <p className="text-gray-600">
-            Vel opptil 3 medspelare du vil spele med på laget.
+            {isEditing 
+              ? 'Du har allereie svart. Du kan endre valet ditt nedanfor.' 
+              : 'Vel opptil 3 medspelare du vil spele med på laget.'}
           </p>
+          {isEditing && (
+            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+              💡 Tips: Du kan gå inn på lenka di når som helst for å endre svaret.
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
@@ -244,7 +279,7 @@ function VoteContent() {
                   : 'bg-green-600 hover:bg-green-700 active:scale-95'
               }`}
             >
-              {submitting ? 'Sender inn...' : 'Send inn val'}
+              {submitting ? 'Sender inn...' : isEditing ? 'Oppdater val' : 'Send inn val'}
             </button>
           </div>
         </div>

@@ -17,11 +17,11 @@ CREATE TABLE responses (
   choice_2 UUID REFERENCES players(id),
   choice_3 UUID REFERENCES players(id),
   no_preference BOOLEAN DEFAULT FALSE,
-  submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  CONSTRAINT unique_response UNIQUE(player_id)
+  submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Index for raskare oppslag
+CREATE UNIQUE INDEX unique_player_response ON responses(player_id);
 CREATE INDEX idx_invite_token ON players(invite_token);
 CREATE INDEX idx_player_responses ON responses(player_id);
 

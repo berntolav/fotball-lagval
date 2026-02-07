@@ -28,11 +28,7 @@ export async function POST(request: NextRequest) {
       .eq('player_id', player.id)
       .single()
 
-    if (existingResponse) {
-      return NextResponse.json({ error: 'Du har allereie svart' }, { status: 409 })
-    }
-
-    // Lagre svaret
+    // Lag responseData objekt
     const responseData: any = {
       player_id: player.id,
       no_preference: noPreference || false,
@@ -42,13 +38,37 @@ export async function POST(request: NextRequest) {
       if (choices[0]) responseData.choice_1 = choices[0]
       if (choices[1]) responseData.choice_2 = choices[1]
       if (choices[2]) responseData.choice_3 = choices[2]
+    } else {
+      // Nullstill val viss "veit ikkje"
+      responseData.choice_1 = null
+      responseData.choice_2 = null
+      responseData.choice_3 = null
     }
 
-    const { data, error } = await supabase
-      .from('responses')
-      .insert([responseData])
-      .select()
-      .single()
+    let data, error
+
+    if (existingResponse) {
+      // Oppdater eksisterande svar
+      const result = await supabase
+        .from('responses')
+        .update(responseData)
+        .eq('player_id', player.id)
+        .select()
+        .single()
+      
+      data = result.data
+      error = result.error
+    } else {
+      // Opprett nytt svar
+      const result = await supabase
+        .from('responses')
+        .insert([responseData])
+        .select()
+        .single()
+      
+      data = result.data
+      error = result.error
+    }
 
     if (error) {
       console.error('Database error:', error)

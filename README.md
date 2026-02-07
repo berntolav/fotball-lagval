@@ -8,7 +8,7 @@ Ein mobilvenleg applikasjon for å la fotballspelare velge kven dei vil spele me
 - ✅ Mobilvenleg design
 - ✅ Vel opptil 3 medspelare
 - ✅ "Veit ikkje" alternativ
-- ✅ Berre éin stemme per spelar
+- ✅ **Kan endre svar når som helst** (gå inn på lenka på nytt)
 - ✅ Lagrar alle val i database
 
 ## Teknologiar
